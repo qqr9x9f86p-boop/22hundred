@@ -517,17 +517,13 @@ function setClosed(){
   countdownCaption.textContent='Shop opens for 48 hours. Password required to enter.';
 }
 
-const DEMO_MODE = new URLSearchParams(location.search).has('demo');
-
 function tick(){
   const now=Date.now();
   const dropOpen=endOfMonth();
   const shopClose=dropOpen+SHOP_WINDOW_MS;
 
   let diff, state;
-  if(DEMO_MODE){
-    state='live';
-  } else if(now < dropOpen){
+  if(now < dropOpen){
     diff=dropOpen-now; state='next';
   } else if(now < shopClose){
     state='live';

@@ -1,7 +1,5 @@
 const db = require('./_db');
 
-const DEMO_PASSWORD = 'DEM-O';
-
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -11,16 +9,6 @@ module.exports = async (req, res) => {
 
   const { password } = req.body || {};
   if (!password) return res.status(400).json({ ok: false });
-
-  // Demo mode — works without Firebase
-  if (password.toUpperCase().trim() === DEMO_PASSWORD) {
-    return res.json({
-      ok: true,
-      dropNumber: '000',
-      closeAt: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
-      demo: true,
-    });
-  }
 
   const now = new Date();
 
