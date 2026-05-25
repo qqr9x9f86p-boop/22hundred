@@ -160,7 +160,7 @@
 
   .hero-eyebrow {
     font-family: var(--mono); font-weight: 200; font-size: 10px;
-    letter-spacing: 0.4em; color: var(--fg-muted); margin-bottom: 40px;
+    letter-spacing: 0.4em; color: var(--fg-muted); margin-bottom: 18px;
     opacity: 0; animation: fade-up 1.4s var(--ease) .4s forwards;
   }
   .hero-eyebrow .sep { margin: 0 12px; color: var(--fg-faint); }
@@ -255,6 +255,17 @@
     padding: 100px var(--pad-x) 100px; text-align: center;
     border-top: 1px solid var(--line); position: relative;
   }
+  .countdown-inline {
+    width: 100%; max-width: 460px; text-align: center;
+    padding: 28px 0 0; margin-bottom: 0;
+    opacity: 0; animation: fade-up 1.4s var(--ease) 1.25s forwards;
+  }
+  .countdown-inline .countdown-label { margin-bottom: 20px; }
+  .countdown-inline .countdown { gap: clamp(8px,2vw,20px); }
+  .countdown-inline .unit .num { font-size: clamp(1.6rem,5vw,3rem); }
+  .countdown-inline .unit.ms .num { font-size: clamp(1rem,3vw,1.8rem); }
+  .countdown-inline .sep { font-size: clamp(1.6rem,5vw,3rem); }
+  .countdown-inline .countdown-caption { margin-top: 20px; font-size: 10px; }
   .countdown-label {
     font-family: var(--mono); font-weight: 200; font-size: 10px;
     letter-spacing: 0.38em; text-transform: uppercase; color: var(--fg-muted); margin-bottom: 56px;
@@ -377,6 +388,23 @@
 
     <div class="divider-line" aria-hidden="true"></div>
 
+    <div class="countdown-inline" aria-label="Countdown to drop">
+      <div class="countdown-label">Drop Opens In</div>
+      <div class="countdown" id="countdown">
+        <div class="unit"><span class="num" id="d">00</span><span class="lbl">Days</span></div>
+        <span class="sep" aria-hidden="true">:</span>
+        <div class="unit"><span class="num" id="h">00</span><span class="lbl">Hours</span></div>
+        <span class="sep" aria-hidden="true">:</span>
+        <div class="unit"><span class="num" id="m">00</span><span class="lbl">Minutes</span></div>
+        <span class="sep" aria-hidden="true">:</span>
+        <div class="unit"><span class="num" id="s">00</span><span class="lbl">Seconds</span></div>
+        <div class="unit ms"><span class="num" id="ms">000</span><span class="lbl">MS</span></div>
+      </div>
+      <p class="countdown-caption">Password holders get first access. 48-hour window. Then it closes.</p>
+    </div>
+
+    <div class="divider-line" aria-hidden="true" style="margin-top:40px;margin-bottom:0"></div>
+
     <form class="form" id="signupForm" novalidate>
       <div class="form-block">
         <!-- Name -->
@@ -398,21 +426,6 @@
       </div>
       <div class="form-message" id="formMessage" role="status" aria-live="polite"></div>
     </form>
-  </section>
-
-  <section class="countdown-section" aria-label="Countdown to next release">
-    <div class="countdown-label">Drop Opens In</div>
-    <div class="countdown" id="countdown">
-      <div class="unit"><span class="num" id="d">00</span><span class="lbl">Days</span></div>
-      <span class="sep" aria-hidden="true">:</span>
-      <div class="unit"><span class="num" id="h">00</span><span class="lbl">Hours</span></div>
-      <span class="sep" aria-hidden="true">:</span>
-      <div class="unit"><span class="num" id="m">00</span><span class="lbl">Minutes</span></div>
-      <span class="sep" aria-hidden="true">:</span>
-      <div class="unit"><span class="num" id="s">00</span><span class="lbl">Seconds</span></div>
-      <div class="unit ms"><span class="num" id="ms">000</span><span class="lbl">MS</span></div>
-    </div>
-    <p class="countdown-caption">Password holders get first access. 48-hour window. Then it closes.</p>
   </section>
 
   <footer class="footer">
