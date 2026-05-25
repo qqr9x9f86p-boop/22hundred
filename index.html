@@ -477,7 +477,7 @@ tick(); setInterval(tick,40);
       · Who has access: Anyone
    5. Copy the Web app URL and paste it below ↓
 ────────────────────────────────────────────────────────────────────── */
-const SHEETS_WEBHOOK = ''; // ← PASTE YOUR APPS SCRIPT URL HERE
+const DISCORD_WEBHOOK = 'https://discord.com/api/webhooks/1508601284951801856/9f_Iesfpjb5vGNwGo1ewkedYEZ5zgyQTZfdmkjdZOd_hWnBMe5DnM43oX6WVWiERFKAe';
 
 /* ── FORM ── */
 const form  = document.getElementById('signupForm');
@@ -489,6 +489,10 @@ const msg   = document.getElementById('formMessage');
 const STORE = '22hundred:submitted';
 const EMAIL_RX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
+function uid(){
+  return '22h_' + Array.from(crypto.getRandomValues(new Uint8Array(5)))
+    .map(b=>b.toString(16).padStart(2,'0')).join('');
+}
 function setMsg(text,kind=''){
   msg.textContent=text;
   msg.className='form-message'+(kind?' '+kind:'');
@@ -511,11 +515,8 @@ form.addEventListener('submit', async (e) => {
   if(!EMAIL_RX.test(email)){ setMsg('Invalid email format.','error'); emailI.focus(); return; }
   if(getSubmitted().includes(email)){ setMsg('You are already on the list.','success'); return; }
 
-  const payload = {
-    name, phone, email,
-    timestamp: new Date().toISOString(),
-    userAgent: navigator.userAgent,
-  };
+  const id = uid();
+  const ts = new Date().toLocaleString('en-US',{timeZone:'America/Detroit',hour12:true});
 
   btn.disabled=true;
   const orig=btn.textContent;
@@ -523,30 +524,28 @@ form.addEventListener('submit', async (e) => {
   setMsg('Transmitting…');
 
   try {
-    let result;
-    if(SHEETS_WEBHOOK){
-      const res = await fetch(SHEETS_WEBHOOK,{
-        method:'POST', mode:'cors',
-        headers:{'Content-Type':'text/plain;charset=utf-8'},
-        body: JSON.stringify(payload),
-        redirect:'follow',
-      });
-      result = await res.json().catch(()=>({ok:true}));
-    } else {
-      // Demo mode — no backend yet
-      await new Promise(r=>setTimeout(r,700));
-      result={ok:true,demo:true};
-      console.info('[22HUNDRED] Demo mode — payload:',payload);
-    }
+    await fetch(DISCORD_WEBHOOK, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        embeds: [{
+          title: '22HUNDRED — New Signup',
+          color: 0xd4af37,
+          fields: [
+            { name: 'ID',    value: '`' + id + '`',       inline: true  },
+            { name: 'Name',  value: name,                  inline: true  },
+            { name: 'Email', value: email,                 inline: false },
+            { name: 'Phone', value: phone || '—',          inline: true  },
+            { name: 'Time',  value: ts,                    inline: true  },
+          ],
+          footer: { text: '22hundred.shop' },
+        }]
+      }),
+    });
 
     remember(email);
     nameI.value=''; phoneI.value=''; emailI.value='';
-
-    if(result?.dup){
-      setMsg('You are already on the list.','success');
-    } else {
-      setMsg('Confirmed. Welcome to the list.','success');
-    }
+    setMsg('Confirmed. Welcome to the list.','success');
   } catch(err){
     console.error(err);
     setMsg('Network error. Try again.','error');
