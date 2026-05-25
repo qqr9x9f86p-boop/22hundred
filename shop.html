@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#000000" />
+<meta name="robots" content="noindex, nofollow" />
+<title>22HUNDRED — Enter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@900&family=JetBrains+Mono:wght@100;200;300;400&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #000; --fg: #f4f4f4; --fg-muted: #8a8a8a; --fg-faint: #3a3a3a;
+    --line: rgba(255,255,255,0.08); --line-strong: rgba(255,255,255,0.18);
+    --display: "Big Shoulders Display", "Impact", sans-serif;
+    --mono: "JetBrains Mono", monospace;
+    --ease: cubic-bezier(0.22,1,0.36,1);
+    --pad-x: clamp(20px,4vw,56px);
+  }
+  *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html,body { background: var(--bg); color: var(--fg); font-family: var(--mono); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+  body { cursor: auto; }
+  ::selection { background: #fff; color: #000; }
+
+  .ambient { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+  .ambient::before {
+    content: ""; position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.5;
+    width: 70vmax; height: 70vmax; top: -20vmax; left: -20vmax;
+    background: radial-gradient(circle, rgba(255,255,255,0.045) 0%, transparent 60%);
+  }
+  .grain {
+    position: fixed; inset: -50%; width: 200%; height: 200%;
+    pointer-events: none; z-index: 95; opacity: 0.07; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.6 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    animation: grain-shift 8s steps(8) infinite;
+  }
+  @keyframes grain-shift {
+    0%  {transform:translate(0,0)}    10%{transform:translate(-2%,-3%)}
+    20% {transform:translate(-4%,2%)} 30%{transform:translate(2%,-4%)}
+    40% {transform:translate(-2%,5%)} 50%{transform:translate(-4%,2%)}
+    60% {transform:translate(3%,0)}   70%{transform:translate(0,3%)}
+    80% {transform:translate(-3%,1%)} 90%{transform:translate(2%,-2%)}
+    100%{transform:translate(0,0)}
+  }
+  .vignette {
+    position: fixed; inset: 0; pointer-events: none; z-index: 90;
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.55) 100%);
+  }
+
+  .shell { position: relative; z-index: 10; display: flex; flex-direction: column; min-height: 100vh; }
+
+  .nav {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 28px var(--pad-x); font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--fg-muted);
+  }
+  .nav-mark { font-family: var(--display); font-weight: 900; font-size: 18px; letter-spacing: 0.04em; color: var(--fg); }
+  .nav-status { display: flex; align-items: center; gap: 10px; font-size: 10px; letter-spacing: 0.18em; }
+  .pulse { width: 6px; height: 6px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 8px rgba(34,197,94,0.6); animation: pulse 2.2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.35;transform:scale(0.85)} }
+
+  /* ── GATE (closed state) ── */
+  .gate {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 40px var(--pad-x) 60px; text-align: center;
+  }
+
+  .gate-label {
+    font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--fg-muted); margin-bottom: 16px;
+    opacity: 0; animation: fade-up 1s var(--ease) 0.2s forwards;
+  }
+  .gate-mark {
+    font-family: var(--display); font-weight: 900;
+    font-size: clamp(3rem,14vw,10rem); line-height: 0.85; letter-spacing: -0.02em;
+    color: var(--fg); margin-bottom: 32px;
+    opacity: 0; animation: fade-up 1s var(--ease) 0.35s forwards;
+  }
+
+  /* Password input block */
+  .pw-block {
+    width: 100%; max-width: 380px;
+    border: 1px solid var(--line-strong); background: rgba(255,255,255,0.015);
+    margin-bottom: 16px;
+    opacity: 0; animation: fade-up 1s var(--ease) 0.5s forwards;
+  }
+  .pw-block input {
+    width: 100%; background: transparent; border: none; outline: none;
+    padding: 18px 20px; font-size: 16px; font-family: var(--mono);
+    font-weight: 300; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--fg); text-align: center;
+  }
+  .pw-block input::placeholder { color: var(--fg-faint); letter-spacing: 0.25em; }
+  .pw-submit {
+    width: 100%; max-width: 380px; padding: 16px; font-family: var(--mono);
+    font-size: 11px; font-weight: 600; letter-spacing: 0.28em; text-transform: uppercase;
+    color: var(--bg); background: var(--fg); border: none; cursor: pointer;
+    transition: background 0.3s; min-height: 52px;
+    opacity: 0; animation: fade-up 1s var(--ease) 0.6s forwards;
+  }
+  .pw-submit:hover { background: #fff; }
+  .pw-submit:disabled { opacity: 0.5; cursor: default; }
+
+  .gate-msg {
+    margin-top: 16px; min-height: 16px;
+    font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--fg-muted);
+    transition: color 0.3s;
+  }
+  .gate-msg.error   { color: #ff6b6b; }
+  .gate-msg.success { color: #22c55e; }
+
+  /* ── SHOP (unlocked state) ── */
+  .shop { display: none; flex: 1; flex-direction: column; align-items: center; padding: 40px var(--pad-x) 60px; }
+  .shop.active { display: flex; }
+
+  .shop-header {
+    text-align: center; margin-bottom: 48px; width: 100%; max-width: 900px;
+  }
+  .shop-drop-label { font-size: 9px; letter-spacing: 0.3em; color: var(--fg-muted); margin-bottom: 8px; }
+  .shop-title { font-family: var(--display); font-weight: 900; font-size: clamp(2.5rem,10vw,7rem); line-height: 0.9; }
+  .shop-closes { font-size: 9px; letter-spacing: 0.2em; color: var(--fg-muted); margin-top: 12px; }
+
+  .products {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1px; background: var(--line); width: 100%; max-width: 900px;
+  }
+  .product-card {
+    background: var(--bg); padding: 32px 28px; cursor: pointer;
+    transition: background 0.2s;
+  }
+  .product-card:hover { background: rgba(255,255,255,0.025); }
+  .product-img {
+    width: 100%; aspect-ratio: 1; background: #0a0a0a;
+    border: 1px solid var(--line); margin-bottom: 20px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; letter-spacing: 0.2em; color: var(--fg-faint);
+  }
+  .product-name { font-size: 13px; font-weight: 400; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 6px; }
+  .product-price { font-size: 11px; color: var(--fg-muted); letter-spacing: 0.12em; }
+  .product-badge { font-size: 8px; letter-spacing: 0.2em; color: #22c55e; margin-top: 4px; }
+
+  /* Closed state overlay */
+  .closed-state {
+    flex: 1; display: none; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 40px var(--pad-x); text-align: center;
+  }
+  .closed-state.active { display: flex; }
+  .closed-title { font-family: var(--display); font-weight: 900; font-size: clamp(2rem,10vw,6rem); color: var(--fg-faint); margin-bottom: 16px; }
+  .closed-sub { font-size: 10px; letter-spacing: 0.25em; color: var(--fg-faint); }
+  .back-link { margin-top: 32px; font-size: 9px; letter-spacing: 0.2em; color: var(--fg-faint); text-decoration: none; transition: color 0.2s; }
+  .back-link:hover { color: var(--fg-muted); }
+
+  .footer {
+    padding: 28px var(--pad-x); border-top: 1px solid var(--line);
+    font-size: 10px; font-weight: 300; letter-spacing: 0.22em;
+    text-transform: uppercase; color: var(--fg-muted); position: relative; z-index: 10;
+  }
+  .footer-row { display: flex; justify-content: space-between; align-items: center; }
+
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (min-width: 640px) {
+    body { cursor: none; }
+    .cursor-dot, .cursor-ring { display: block; }
+  }
+
+  /* Cursor */
+  .cursor-dot, .cursor-ring { position: fixed; top:0; left:0; pointer-events:none; z-index:9999; display:none; will-change:transform; }
+  .cursor-dot { width:4px; height:4px; background:#fff; border-radius:50%; transform:translate(-50%,-50%); }
+  .cursor-ring { width:32px; height:32px; border:1px solid rgba(255,255,255,0.4); border-radius:50%; transform:translate(-50%,-50%); transition:transform .25s,width .25s,height .25s,border-color .25s; }
+</style>
+</head>
+<body>
+
+<div class="ambient" aria-hidden="true"></div>
+<div class="grain"   aria-hidden="true"></div>
+<div class="vignette" aria-hidden="true"></div>
+<div class="cursor-ring" aria-hidden="true"></div>
+<div class="cursor-dot"  aria-hidden="true"></div>
+
+<div class="shell">
+
+  <nav class="nav">
+    <div class="nav-mark">MMCC</div>
+    <div class="nav-status">
+      <span class="pulse" id="navPulse"></span>
+      <span id="navDrop">DROP 000 / LIVE</span>
+    </div>
+  </nav>
+
+  <!-- PASSWORD GATE (shown when drop is live) -->
+  <div class="gate" id="gateView">
+    <div class="gate-label">Drop 000 — Enter Password</div>
+    <div class="gate-mark">22HUNDRED</div>
+
+    <div class="pw-block">
+      <input type="text" id="pwInput" placeholder="XXX-XXX" maxlength="7" autocomplete="off" autocorrect="off" spellcheck="false" />
+    </div>
+    <button class="pw-submit" id="pwBtn">ENTER</button>
+    <div class="gate-msg" id="gateMsg" role="status" aria-live="polite"></div>
+  </div>
+
+  <!-- SHOP (shown after correct password) -->
+  <div class="shop" id="shopView">
+    <div class="shop-header">
+      <div class="shop-drop-label">DROP 000 — LIVE NOW</div>
+      <div class="shop-title">22HUNDRED</div>
+      <div class="shop-closes" id="shopClosesLabel"></div>
+    </div>
+
+    <div class="products" id="productGrid">
+      <!-- Products load here — add via admin or hardcode per drop -->
+      <div class="product-card">
+        <div class="product-img">PHOTO COMING</div>
+        <div class="product-name">Drop 000 — Item 01</div>
+        <div class="product-price">$—</div>
+        <div class="product-badge">● LIVE</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CLOSED (shown when no active drop) -->
+  <div class="closed-state" id="closedView">
+    <div class="closed-title">CLOSED</div>
+    <div class="closed-sub">Shop is closed. Get your password for the next drop.</div>
+    <a href="/" class="back-link">← Back to 22hundred.shop</a>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-row">
+      <div>© 22HUNDRED · ALL RIGHTS RESERVED</div>
+      <a href="/" style="font-size:9px;letter-spacing:0.2em;color:var(--fg-faint);text-decoration:none;">← HOME</a>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+'use strict';
+
+const SESSION_KEY = '22h_shop_session';
+
+// Check if this session has a validated password
+function getSession() {
+  try { return JSON.parse(sessionStorage.getItem(SESSION_KEY) || 'null'); } catch { return null; }
+}
+function saveSession(data) {
+  sessionStorage.setItem(SESSION_KEY, JSON.stringify(data));
+}
+
+function showGate()   { document.getElementById('gateView').style.display=''; document.getElementById('shopView').classList.remove('active'); document.getElementById('closedView').classList.remove('active'); }
+function showShop()   { document.getElementById('gateView').style.display='none'; document.getElementById('shopView').classList.add('active'); document.getElementById('closedView').classList.remove('active'); }
+function showClosed() { document.getElementById('gateView').style.display='none'; document.getElementById('shopView').classList.remove('active'); document.getElementById('closedView').classList.add('active'); }
+
+// Check if we have a valid session (already entered password this session)
+const session = getSession();
+if (session && session.closeAt && new Date() < new Date(session.closeAt)) {
+  showShop();
+  document.getElementById('shopClosesLabel').textContent =
+    'Shop closes ' + new Date(session.closeAt).toLocaleString('en-US',{timeZone:'America/Detroit',hour12:true}) + ' ET';
+}
+
+// Password submit
+const pwInput = document.getElementById('pwInput');
+const pwBtn   = document.getElementById('pwBtn');
+const gateMsg = document.getElementById('gateMsg');
+
+function setMsg(text, kind='') {
+  gateMsg.textContent = text;
+  gateMsg.className = 'gate-msg' + (kind ? ' ' + kind : '');
+}
+
+// Format input as XXX-XXX automatically
+pwInput.addEventListener('input', () => {
+  let v = pwInput.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (v.length > 3) v = v.slice(0,3) + '-' + v.slice(3,6);
+  pwInput.value = v;
+  if (gateMsg.textContent) setMsg('');
+});
+
+pwInput.addEventListener('keydown', e => { if (e.key === 'Enter') submitPassword(); });
+pwBtn.addEventListener('click', submitPassword);
+
+async function submitPassword() {
+  const password = pwInput.value.trim();
+  if (!password) { setMsg('Enter your password.', 'error'); return; }
+
+  pwBtn.disabled = true;
+  pwBtn.textContent = 'VERIFYING…';
+  setMsg('');
+
+  try {
+    const res = await fetch('/api/validate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password }),
+    });
+    const data = await res.json();
+
+    if (data.ok) {
+      saveSession({ closeAt: data.closeAt, dropNumber: data.dropNumber });
+      document.getElementById('shopClosesLabel').textContent =
+        'Shop closes ' + new Date(data.closeAt).toLocaleString('en-US',{timeZone:'America/Detroit',hour12:true}) + ' ET';
+      showShop();
+    } else if (data.reason === 'drop_closed') {
+      showClosed();
+    } else if (data.reason === 'no_active_drop') {
+      showClosed();
+    } else {
+      setMsg('Invalid password.', 'error');
+      pwBtn.disabled = false;
+      pwBtn.textContent = 'ENTER';
+    }
+  } catch {
+    setMsg('Connection error. Try again.', 'error');
+    pwBtn.disabled = false;
+    pwBtn.textContent = 'ENTER';
+  }
+}
+
+// Cursor (desktop only)
+const dot  = document.querySelector('.cursor-dot');
+const ring = document.querySelector('.cursor-ring');
+if (window.matchMedia('(min-width:640px)').matches) {
+  let rx=0, ry=0;
+  document.addEventListener('mousemove', e => {
+    dot.style.transform  = `translate(calc(${e.clientX}px - 50%), calc(${e.clientY}px - 50%))`;
+    rx += (e.clientX - rx) * 0.12;
+    ry += (e.clientY - ry) * 0.12;
+    ring.style.transform = `translate(calc(${rx}px - 50%), calc(${ry}px - 50%))`;
+  });
+}
+</script>
+</body>
+</html>

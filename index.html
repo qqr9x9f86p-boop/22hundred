@@ -322,6 +322,11 @@
     transition: color .6s ease;
   }
   .footer-hidden:hover { color: var(--fg-muted); }
+  .footer-social {
+    color: var(--fg-faint); text-decoration: none; display: flex; align-items: center;
+    transition: color .3s ease;
+  }
+  .footer-social:hover { color: var(--fg-muted); }
 
   /* Animations */
   @keyframes fade-up {
@@ -458,7 +463,15 @@
   <footer class="footer">
     <div class="footer-row">
       <div>© 22HUNDRED · ALL RIGHTS RESERVED</div>
-      <div class="footer-hidden" title="MMCC">MMCC</div>
+      <div style="display:flex;align-items:center;gap:20px;">
+        <a href="https://instagram.com/22hundred.shop" target="_blank" rel="noreferrer" class="footer-social" aria-label="Instagram">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/></svg>
+        </a>
+        <a href="https://x.com/22hundred_shop" target="_blank" rel="noreferrer" class="footer-social" aria-label="X">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        </a>
+        <div class="footer-hidden" title="MMCC">MMCC</div>
+      </div>
     </div>
   </footer>
 
@@ -513,14 +526,18 @@ function tick(){
   if(now < dropOpen){
     diff=dropOpen-now; state='next';
   } else if(now < shopClose){
-    diff=shopClose-now; state='live';
+    state='live';
   } else {
     diff=endOfMonth(new Date(now+1000))-now; state='closed';
   }
 
-  if(state==='live') setLive();
-  else if(state==='closed') setClosed();
-  else setNext();
+  if(state==='live'){
+    setLive();
+    dEl.textContent='00'; hEl.textContent='00';
+    mEl.textContent='00'; sEl.textContent='00'; msEl.textContent='000';
+    return;
+  }
+  if(state==='closed') setClosed(); else setNext();
 
   dEl.textContent=pad(Math.floor(diff/86400000));
   hEl.textContent=pad(Math.floor((diff%86400000)/3600000));
@@ -609,28 +626,21 @@ form.addEventListener('submit', async (e) => {
   setMsg('Transmitting…');
 
   try {
-    await fetch(DISCORD_WEBHOOK, {
+    const res = await fetch('/api/submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        embeds: [{
-          title: '22HUNDRED — New Signup',
-          color: 0xd4af37,
-          fields: [
-            { name: 'ID',    value: '`' + id + '`',       inline: true  },
-            { name: 'Name',  value: name,                  inline: true  },
-            { name: 'Email', value: email,                 inline: false },
-            { name: 'Phone', value: phone || '—',          inline: true  },
-            { name: 'Time',  value: ts,                    inline: true  },
-          ],
-          footer: { text: '22hundred.shop' },
-        }]
-      }),
+      body: JSON.stringify({ name, phone, email }),
     });
+    const data = await res.json().catch(()=>({ok:true}));
 
     remember(dedupKey);
     nameI.value=''; phoneI.value=''; emailI.value='';
-    setMsg('Confirmed. Password incoming.','success');
+
+    if(data.dup){
+      setMsg('You are already on the list.','success');
+    } else {
+      setMsg('Confirmed. Password incoming.','success');
+    }
   } catch(err){
     console.error(err);
     setMsg('Network error. Try again.','error');
