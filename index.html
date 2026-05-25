@@ -155,15 +155,16 @@
   .hero {
     flex: 1; display: flex; flex-direction: column;
     align-items: center; justify-content: center;
-    padding: 60px var(--pad-x) 80px; text-align: center; position: relative;
+    padding: 36px var(--pad-x) 52px; text-align: center; position: relative;
   }
 
   .hero-eyebrow {
-    font-family: var(--mono); font-weight: 200; font-size: 10px;
-    letter-spacing: 0.4em; color: var(--fg-muted); margin-bottom: 18px;
+    font-family: var(--mono); font-weight: 200; font-size: 9px;
+    letter-spacing: 0.14em; color: var(--fg-muted); margin-bottom: 18px;
     opacity: 0; animation: fade-up 1.4s var(--ease) .4s forwards;
+    line-height: 2;
   }
-  .hero-eyebrow .sep { margin: 0 12px; color: var(--fg-faint); }
+  .hero-eyebrow .sep { margin: 0 8px; color: var(--fg-faint); }
 
   .hero-mark {
     font-family: var(--display); font-weight: 900;
@@ -174,15 +175,15 @@
   }
 
   .hero-sub {
-    margin-top: 28px; font-size: 13px; font-weight: 300;
-    letter-spacing: 0.3em; text-transform: uppercase; color: var(--fg-muted);
+    margin-top: 20px; font-size: 12px; font-weight: 300;
+    letter-spacing: 0.28em; text-transform: uppercase; color: var(--fg-muted);
     opacity: 0; animation: fade-up 1.4s var(--ease) 1.0s forwards;
   }
 
   .divider-line {
-    width: 1px; height: 60px;
+    width: 1px; height: 44px;
     background: linear-gradient(180deg, transparent, var(--line-strong), transparent);
-    margin: 56px auto 40px; opacity: 0;
+    margin: 32px auto 28px; opacity: 0;
     animation: line-grow 1.6s var(--ease) 1.2s forwards; transform-origin: center;
   }
 
@@ -215,13 +216,13 @@
 
   /* Last row — email + button, no bottom border */
   .form-row {
-    display: flex; align-items: stretch;
+    display: flex; align-items: stretch; flex-direction: column;
   }
 
   .form input {
     width: 100%; background: transparent; border: none; outline: none;
-    padding: 18px 20px; font-size: 13px; font-weight: 400;
-    letter-spacing: 0.04em; color: var(--fg); cursor: none;
+    padding: 16px 18px; font-size: 16px; font-weight: 400;
+    letter-spacing: 0.04em; color: var(--fg); cursor: auto;
   }
   .form input::placeholder {
     color: var(--fg-muted); font-weight: 300; letter-spacing: 0.04em;
@@ -231,10 +232,11 @@
   .form-row input { flex: 1; }
 
   .form button[type="submit"] {
-    padding: 0 26px; font-size: 11px; font-weight: 600;
+    width: 100%; padding: 16px; font-size: 11px; font-weight: 600;
     letter-spacing: 0.28em; color: var(--bg); background: var(--fg);
-    white-space: nowrap; flex-shrink: 0;
+    white-space: nowrap; flex-shrink: 0; border-top: 1px solid var(--line-strong);
     transition: background .3s var(--ease), letter-spacing .3s var(--ease);
+    min-height: 52px; cursor: pointer;
   }
   .form button[type="submit"]:hover { background: #ffffff; letter-spacing: 0.32em; }
   .form button[type="submit"]:disabled {
@@ -257,15 +259,17 @@
   }
   .countdown-inline {
     width: 100%; max-width: 460px; text-align: center;
-    padding: 28px 0 0; margin-bottom: 0;
+    padding: 0; margin-bottom: 0;
     opacity: 0; animation: fade-up 1.4s var(--ease) 1.25s forwards;
   }
-  .countdown-inline .countdown-label { margin-bottom: 20px; }
-  .countdown-inline .countdown { gap: clamp(8px,2vw,20px); }
-  .countdown-inline .unit .num { font-size: clamp(1.6rem,5vw,3rem); }
-  .countdown-inline .unit.ms .num { font-size: clamp(1rem,3vw,1.8rem); }
-  .countdown-inline .sep { font-size: clamp(1.6rem,5vw,3rem); }
-  .countdown-inline .countdown-caption { margin-top: 20px; font-size: 10px; }
+  .countdown-inline .countdown-label { margin-bottom: 16px; font-size: 9px; letter-spacing: 0.28em; }
+  .countdown-inline .countdown { gap: clamp(6px,2vw,16px); }
+  .countdown-inline .unit .num { font-size: clamp(1.8rem,6.5vw,3.2rem); }
+  .countdown-inline .unit.ms .num { font-size: clamp(1.1rem,3.5vw,1.9rem); margin-top: 0.35em; }
+  .countdown-inline .unit.ms { display: flex; }
+  .countdown-inline .sep { font-size: clamp(1.8rem,6.5vw,3.2rem); }
+  .countdown-inline .unit .lbl { font-size: 9px; letter-spacing: 0.2em; }
+  .countdown-inline .countdown-caption { margin-top: 16px; font-size: 9px; letter-spacing: 0.22em; }
   .countdown-label {
     font-family: var(--mono); font-weight: 200; font-size: 10px;
     letter-spacing: 0.38em; text-transform: uppercase; color: var(--fg-muted); margin-bottom: 56px;
@@ -327,24 +331,33 @@
     to   { opacity: 1; transform: scaleY(1); }
   }
 
-  /* Responsive */
-  @media (max-width: 720px) {
-    .nav-status { display: none; }
-    .form-row { flex-direction: column; }
-    .form button[type="submit"] { padding: 16px; border-top: 1px solid var(--line-strong); }
-    .countdown { gap: 8px; }
-    .sep { font-size: clamp(2rem, 8vw, 4rem); padding-top: 4px; }
-    .unit .num { font-size: clamp(2.4rem, 13vw, 5rem); }
-    .unit.ms { display: none; }
-    .countdown-section { padding: 70px var(--pad-x); }
-    body { cursor: auto; }
-    .cursor-dot, .cursor-ring { display: none; }
-    input, button { cursor: pointer !important; }
-    .form input { cursor: text !important; }
+  /* Base = mobile. Enhance up. */
+  .nav-status { display: none; }
+  body { cursor: auto; }
+  .cursor-dot, .cursor-ring { display: none; }
+
+  @media (min-width: 640px) {
+    .nav-status { display: flex; }
+    body { cursor: none; }
+    .cursor-dot, .cursor-ring { display: block; }
+    .form input { font-size: 13px; padding: 18px 20px; cursor: none; }
+    .hero { padding: 56px var(--pad-x) 72px; }
+    .hero-eyebrow { font-size: 10px; letter-spacing: 0.36em; }
+    .hero-eyebrow .sep { margin: 0 12px; }
+    .hero-sub { font-size: 13px; letter-spacing: 0.3em; }
+    .divider-line { height: 56px; margin: 40px auto 32px; }
+    .form-row { flex-direction: row; }
+    .form button[type="submit"] {
+      width: auto; padding: 0 26px; border-top: none;
+      border-left: 1px solid var(--line-strong); min-height: unset;
+    }
+    .countdown-inline .countdown-label { font-size: 10px; }
+    .countdown-inline .unit .lbl { font-size: 10px; letter-spacing: 0.3em; }
+    .countdown-inline .countdown-caption { font-size: 10px; }
   }
-  @media (max-width: 420px) {
-    .hero-eyebrow .sep:last-of-type,
-    .hero-eyebrow .underground { display: none; }
+
+  @media (min-width: 960px) {
+    .hero-eyebrow { letter-spacing: 0.4em; }
   }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
@@ -403,7 +416,7 @@
       <p class="countdown-caption">Shop opens for 48 hours. Password required to enter.</p>
     </div>
 
-    <div class="divider-line" aria-hidden="true" style="margin-top:40px;margin-bottom:0"></div>
+    <div class="divider-line" aria-hidden="true" style="margin-top:28px;margin-bottom:0;opacity:1"></div>
 
     <form class="form" id="signupForm" novalidate>
       <div class="form-block">
