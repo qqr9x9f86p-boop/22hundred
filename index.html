@@ -253,6 +253,15 @@
   .form-message.error   { color: #ff6b6b; }
   .form-message.success { color: var(--fg); }
 
+  .login-link {
+    display: block; margin-top: 28px;
+    font-family: var(--mono); font-size: 9px; font-weight: 300;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--fg-faint); text-decoration: none;
+    transition: color .3s ease;
+  }
+  .login-link:hover { color: var(--fg-muted); }
+
   /* Countdown */
   .countdown-section {
     padding: 100px var(--pad-x) 100px; text-align: center;
@@ -441,6 +450,9 @@
       </div>
       <div class="form-message" id="formMessage" role="status" aria-live="polite"></div>
     </form>
+
+    <a href="/shop" class="login-link">Have a password? Enter here</a>
+
   </section>
 
   <footer class="footer">
