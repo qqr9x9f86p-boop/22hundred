@@ -390,7 +390,7 @@
         <!-- Email + Submit -->
         <div class="form-row">
           <label for="emailInput" style="position:absolute;left:-9999px">Email</label>
-          <input type="email" id="emailInput" name="email" placeholder="Email Address" autocomplete="email" required />
+          <input type="email" id="emailInput" name="email" placeholder="Email Address" autocomplete="email" />
           <button type="submit" id="submitBtn">GET PASSWORD TODAY</button>
         </div>
       </div>
@@ -510,8 +510,10 @@ form.addEventListener('submit', async (e) => {
   const email = emailI.value.trim().toLowerCase();
 
   if(!name){ setMsg('Please enter your name.','error'); nameI.focus(); return; }
-  if(!EMAIL_RX.test(email)){ setMsg('Invalid email format.','error'); emailI.focus(); return; }
-  if(getSubmitted().includes(email)){ setMsg('You are already on the list.','success'); return; }
+  if(!phone && !email){ setMsg('Please enter a phone number or email.','error'); phoneI.focus(); return; }
+  if(email && !EMAIL_RX.test(email)){ setMsg('Invalid email format.','error'); emailI.focus(); return; }
+  const dedupKey = email || phone;
+  if(getSubmitted().includes(dedupKey)){ setMsg('You are already on the list.','success'); return; }
 
   const id = uid();
   const ts = new Date().toLocaleString('en-US',{timeZone:'America/Detroit',hour12:true});
@@ -541,7 +543,7 @@ form.addEventListener('submit', async (e) => {
       }),
     });
 
-    remember(email);
+    remember(dedupKey);
     nameI.value=''; phoneI.value=''; emailI.value='';
     setMsg('Confirmed. Password incoming.','success');
   } catch(err){
