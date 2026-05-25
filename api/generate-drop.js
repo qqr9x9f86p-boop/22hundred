@@ -35,7 +35,8 @@ module.exports = async (req, res) => {
   }
 
   const resend = new Resend(process.env.RESEND_API_KEY);
-  const smsClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+  const twilioReady = process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && process.env.TWILIO_PHONE_NUMBER;
+  const smsClient = twilioReady ? twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN) : null;
 
   const password = genPassword();
   const dropNumber = await nextDropNumber();
@@ -65,7 +66,7 @@ module.exports = async (req, res) => {
     if (s.email) {
       try {
         await resend.emails.send({
-          from: '22HUNDRED <drop@22hundred.shop>',
+          from: '22HUNDRED <drop@getmaya.support>',
           to: s.email,
           subject: `DROP ${dropNumber} IS LIVE — Your Password`,
           html: `
@@ -85,7 +86,7 @@ module.exports = async (req, res) => {
     }
 
     // SMS
-    if (s.phone) {
+    if (twilioReady && s.phone) {
       const to = normalizePhone(s.phone);
       if (to) {
         try {
