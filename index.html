@@ -162,9 +162,10 @@
     font-family: var(--mono); font-weight: 200; font-size: 9px;
     letter-spacing: 0.14em; color: var(--fg-muted); margin-bottom: 18px;
     opacity: 0; animation: fade-up 1.4s var(--ease) .4s forwards;
-    line-height: 2;
+    display: flex; flex-direction: column; align-items: center; gap: 5px;
   }
-  .hero-eyebrow .sep { margin: 0 8px; color: var(--fg-faint); }
+  .hero-eyebrow .phrase { white-space: nowrap; }
+  .hero-eyebrow .dot { display: none; color: var(--fg-faint); }
 
   .hero-mark {
     font-family: var(--display); font-weight: 900;
@@ -342,8 +343,9 @@
     .cursor-dot, .cursor-ring { display: block; }
     .form input { font-size: 13px; padding: 18px 20px; cursor: none; }
     .hero { padding: 56px var(--pad-x) 72px; }
-    .hero-eyebrow { font-size: 10px; letter-spacing: 0.36em; }
-    .hero-eyebrow .sep { margin: 0 12px; }
+    .hero-eyebrow { font-size: 10px; letter-spacing: 0.3em; flex-direction: row; gap: 0; }
+    .hero-eyebrow .dot { display: inline; margin: 0 10px; }
+    .hero-eyebrow .phrase { white-space: nowrap; }
     .hero-sub { font-size: 13px; letter-spacing: 0.3em; }
     .divider-line { height: 56px; margin: 40px auto 32px; }
     .form-row { flex-direction: row; }
@@ -383,17 +385,17 @@
     <div class="nav-mark">MMCC</div>
     <div class="nav-status" aria-live="polite">
       <span class="pulse" aria-hidden="true"></span>
-      <span id="navDrop">DROP 005 / LIVE</span>
+      <span id="navDrop">DROP 000 / NEXT</span>
     </div>
   </nav>
 
   <section class="hero" aria-labelledby="brand">
     <div class="hero-eyebrow">
-      FINISHED &amp; TAILORED IN HOUSE
-      <span class="sep">·</span>
-      PASSWORD ONLY
-      <span class="sep">·</span>
-      SMALL BATCH PRODUCTION
+      <span class="phrase">FINISHED &amp; TAILORED IN HOUSE</span>
+      <span class="dot" aria-hidden="true">·</span>
+      <span class="phrase">PASSWORD ONLY</span>
+      <span class="dot" aria-hidden="true">·</span>
+      <span class="phrase">SMALL BATCH PRODUCTION</span>
     </div>
 
     <h1 class="hero-mark" id="brand">22HUNDRED</h1>
@@ -457,14 +459,57 @@
 const dEl=document.getElementById('d'), hEl=document.getElementById('h'),
       mEl=document.getElementById('m'), sEl=document.getElementById('s'),
       msEl=document.getElementById('ms');
+const countdownLabel=document.querySelector('.countdown-label');
+const countdownCaption=document.querySelector('.countdown-caption');
+const navDrop=document.getElementById('navDrop');
+const pulse=document.querySelector('.pulse');
+const SHOP_WINDOW_MS = 48 * 60 * 60 * 1000;
 const pad=(n,w=2)=>String(n).padStart(w,'0');
+
 function endOfMonth(now=new Date()){
   return new Date(now.getFullYear(),now.getMonth()+1,1,0,0,0,0).getTime()-1;
 }
-let target=endOfMonth();
+
+function setLive(){
+  pulse.style.background='#22c55e';
+  pulse.style.boxShadow='0 0 8px rgba(34,197,94,0.6)';
+  navDrop.textContent='DROP 000 / LIVE';
+  countdownLabel.textContent='Shop Closes In';
+  countdownCaption.textContent='Shop is open. Password required to enter.';
+}
+function setNext(){
+  pulse.style.background='';
+  pulse.style.boxShadow='';
+  navDrop.textContent='DROP 000 / NEXT';
+  countdownLabel.textContent='Drop Opens In';
+  countdownCaption.textContent='Shop opens for 48 hours. Password required to enter.';
+}
+function setClosed(){
+  pulse.style.background='#6b7280';
+  pulse.style.boxShadow='none';
+  navDrop.textContent='DROP 000 / CLOSED';
+  countdownLabel.textContent='Next Drop Opens In';
+  countdownCaption.textContent='Shop opens for 48 hours. Password required to enter.';
+}
+
 function tick(){
-  const now=Date.now(); let diff=target-now;
-  if(diff<=0){target=endOfMonth(new Date(now+1000));diff=target-now;}
+  const now=Date.now();
+  const dropOpen=endOfMonth();
+  const shopClose=dropOpen+SHOP_WINDOW_MS;
+
+  let diff, state;
+  if(now < dropOpen){
+    diff=dropOpen-now; state='next';
+  } else if(now < shopClose){
+    diff=shopClose-now; state='live';
+  } else {
+    diff=endOfMonth(new Date(now+1000))-now; state='closed';
+  }
+
+  if(state==='live') setLive();
+  else if(state==='closed') setClosed();
+  else setNext();
+
   dEl.textContent=pad(Math.floor(diff/86400000));
   hEl.textContent=pad(Math.floor((diff%86400000)/3600000));
   mEl.textContent=pad(Math.floor((diff%3600000)/60000));
