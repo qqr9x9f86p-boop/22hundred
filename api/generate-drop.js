@@ -65,7 +65,7 @@ module.exports = async (req, res) => {
     // Email
     if (s.email) {
       try {
-        await resend.emails.send({
+        const { error: emailErr } = await resend.emails.send({
           from: '22HUNDRED <drop@getmaya.support>',
           to: s.email,
           subject: `DROP ${dropNumber} IS LIVE — Your Password`,
@@ -81,7 +81,7 @@ module.exports = async (req, res) => {
             </div>
           `,
         });
-        emailsSent++;
+        if (emailErr) errors++; else emailsSent++;
       } catch { errors++; }
     }
 
