@@ -307,10 +307,8 @@ async function submitPassword() {
       document.getElementById('shopClosesLabel').textContent =
         'Shop closes ' + new Date(data.closeAt).toLocaleString('en-US',{timeZone:'America/Detroit',hour12:true}) + ' ET';
       showShop();
-    } else if (data.reason === 'drop_closed') {
-      showClosed();
-    } else if (data.reason === 'no_active_drop') {
-      showClosed();
+    } else if (data.reason === 'drop_closed' || data.reason === 'no_active_drop') {
+      window.location.href = '/';
     } else {
       setMsg('Invalid password.', 'error');
       pwBtn.disabled = false;
