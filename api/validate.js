@@ -15,7 +15,6 @@ module.exports = async (req, res) => {
   // Find an active drop whose window is currently open
   const snap = await db.collection('22h_drops')
     .where('status', '==', 'active')
-    .orderBy('createdAt', 'desc')
     .limit(1)
     .get();
 
